@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    // vscode
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    // project
+    "target": "ES2015",
+    "incremental": true,
+    "skipLibCheck": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "noEmit": true,
+    "module": "esnext",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+    // strict
+    // TODO:
+    // package
+  },
+  "exclude": [
+    "samples",
+    "**/__test__",
+    "**/*.test.ts"
+  ],
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ]
+}
