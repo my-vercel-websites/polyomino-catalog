@@ -23,7 +23,7 @@ function RelatedInternal({ getSymmetryGroupResult }: PolyominoPageProps) {
 
   const others = getSymmetryGroupResult.slice(2) as Coord[][];
   const symmetryPolyominoes: Coord[][] = [];
-  const symmetryPolyominoSet = new Set<string>();
+  const symmetryPolyominoSet = new Set<string>([polyomino.map(coord).join()]);
   for (const other of others) {
     const key = other.map(coord).join();
     if (symmetryPolyominoSet.has(key)) {
@@ -37,7 +37,7 @@ function RelatedInternal({ getSymmetryGroupResult }: PolyominoPageProps) {
   const subtract: Coord[][] = [];
   const subtractSet = new Set<string>();
   for (const coord of polyomino) {
-    const subtracted = polyomino.filter((arr) => arr !== coord);
+    const subtracted = canonizeFixed(polyomino.filter((arr) => arr !== coord));
     const string = toString(toBuffer(subtracted));
     if (isValid(string) && !subtractSet.has(string)) {
       subtractSet.add(string);
