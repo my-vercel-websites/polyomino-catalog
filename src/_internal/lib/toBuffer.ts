@@ -1,7 +1,7 @@
 import { Coord } from "./coord";
 
-export function toBuffer(input: Coord[]): Buffer {
-  const buffer = Buffer.alloc(input.length * 2);
+export function toBuffer(input: Coord[]): Uint8Array {
+  const buffer = new Uint8Array(input.length * 2);
 
   input.forEach((coord, index) => {
     const [x, y] = coord;
@@ -19,8 +19,8 @@ export function toBuffer(input: Coord[]): Buffer {
       );
     }
 
-    buffer.writeUInt8(x, index * 2);
-    buffer.writeUInt8(y, index * 2 + 1);
+    buffer[index * 2] = x;
+    buffer[index * 2 + 1] = y;
   });
 
   return buffer;

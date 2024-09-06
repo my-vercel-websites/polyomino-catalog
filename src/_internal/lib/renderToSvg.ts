@@ -8,6 +8,7 @@ export interface RenderToSvgOptions {
   strokeColorHexCode?: string;
   strokeWidth?: number;
   offset?: number;
+  skipSize?: boolean;
 }
 
 export function renderToSvg(
@@ -19,6 +20,7 @@ export function renderToSvg(
     strokeColorHexCode,
     strokeWidth = 20,
     offset = 50,
+    skipSize,
   }: RenderToSvgOptions = {}
 ): string {
   const minX = Math.min(...polyomino.map((c) => c[0]));
@@ -38,13 +40,23 @@ export function renderToSvg(
   const width = (maxX - minX + 1) * cellSize;
   const height = (maxY - minY + 1) * cellSize;
 
-  const svgParts: string[] = [
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${
-      width + offset * 2
-    } ${height + offset * 2}" width="${width + offset * 2}" height="${
-      height + offset * 2
-    }">`,
-  ];
+  const svgParts: string[] = [];
+
+  if (skipSize) {
+    svgParts.push(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${
+        width + offset * 2
+      } ${height + offset * 2}">`
+    );
+  } else {
+    svgParts.push(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${
+        width + offset * 2
+      } ${height + offset * 2}" width="${width + offset * 2}" height="${
+        height + offset * 2
+      }">`
+    );
+  }
 
   if (backgroundColor && backgroundColor !== "transparent") {
     svgParts.push(

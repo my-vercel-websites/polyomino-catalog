@@ -3,8 +3,7 @@ import { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { bufferEqual } from "../../_internal/lib/bufferEqual";
 import { canonizeFixed } from "../../_internal/lib/canonizeFixed";
-import { canonizeFree } from "../../_internal/lib/canonizeFree";
-import { fromBuffer } from "../../_internal/lib/fromBuffer";
+import { getSymmetryGroup } from "../../_internal/lib/getSymmetryGroup";
 import { isValid } from "../../_internal/lib/isValid";
 import { renderToSvg } from "../../_internal/lib/renderToSvg";
 import { toBuffer } from "../../_internal/lib/toBuffer";
@@ -22,15 +21,9 @@ export default async function Page({ params }: Params) {
   const canonized = toBuffer(canonizeFixed(polyomino));
   if (!bufferEqual(canonized, toBuffer(polyomino)))
     throw redirect(`/${toString(canonized)}`);
-  const [canonical, symmetryGroup] = canonizeFree(polyomino);
+  const getSymmetryGroupResult = getSymmetryGroup(polyomino);
 
-  return (
-    <PolyominoPage
-      polyomino={polyomino}
-      canonical={fromBuffer(canonical)}
-      symmetryGroup={symmetryGroup}
-    />
-  );
+  return <PolyominoPage getSymmetryGroupResult={getSymmetryGroupResult} />;
 }
 
 export function generateMetadata({ params }: Params): Metadata {
@@ -40,7 +33,7 @@ export function generateMetadata({ params }: Params): Metadata {
   const canonized = toBuffer(canonizeFixed(polyomino));
   if (!bufferEqual(canonized, toBuffer(polyomino)))
     throw redirect(`/${toString(canonized)}`);
-  const [_, symmetryGroup] = canonizeFree(polyomino);
+  const [symmetryGroup] = getSymmetryGroup(polyomino);
 
   const title = `Polyomino ${anyForm}`;
   const svgString = renderToSvg(polyomino, { backgroundColor: "white" });
