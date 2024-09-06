@@ -3,9 +3,9 @@ import { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { bufferEqual } from "../../_internal/lib/bufferEqual";
 import { canonizeFixed } from "../../_internal/lib/canonizeFixed";
+import { env } from "../../_internal/lib/env";
 import { getSymmetryGroup } from "../../_internal/lib/getSymmetryGroup";
 import { isValid } from "../../_internal/lib/isValid";
-import { renderToSvg } from "../../_internal/lib/renderToSvg";
 import { toBuffer } from "../../_internal/lib/toBuffer";
 import { toString } from "../../_internal/lib/toString";
 import { PolyominoPage } from "../../_internal/pages/PolyominoPage";
@@ -36,17 +36,15 @@ export function generateMetadata({ params }: Params): Metadata {
   const [symmetryGroup] = getSymmetryGroup(polyomino);
 
   const title = `Polyomino ${anyForm}`;
-  const svgString = renderToSvg(polyomino, { backgroundColor: "white" });
-  const base64Svg = Buffer.from(svgString).toString("base64");
-  const imageUrl = `data:image/svg+xml;base64,${base64Svg}`;
   const description = `Polyomino ${anyForm} with symmetry group ${symmetryGroup}`;
 
   return {
+    metadataBase: new URL(env("METADATA_BASE")),
     title,
     description,
     openGraph: {
       title,
-      images: imageUrl,
+      images: `/api/og/${anyForm}`,
       description,
     },
   };

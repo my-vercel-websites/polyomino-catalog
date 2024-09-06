@@ -9,6 +9,7 @@ export interface RenderToSvgOptions {
   strokeWidth?: number;
   offset?: number;
   skipSize?: boolean;
+  contain?: [width: number, height: number];
 }
 
 export function renderToSvg(
@@ -21,6 +22,7 @@ export function renderToSvg(
     strokeWidth = 20,
     offset = 50,
     skipSize,
+    contain,
   }: RenderToSvgOptions = {}
 ): string {
   const minX = Math.min(...polyomino.map((c) => c[0]));
@@ -42,7 +44,12 @@ export function renderToSvg(
 
   const svgParts: string[] = [];
 
-  if (skipSize) {
+  if (contain) {
+    const [width, height] = contain;
+    svgParts.push(
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">`
+    );
+  } else if (skipSize) {
     svgParts.push(
       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${
         width + offset * 2
@@ -59,10 +66,42 @@ export function renderToSvg(
   }
 
   if (backgroundColor && backgroundColor !== "transparent") {
+    if (contain) {
+      const [width, height] = contain;
+      svgParts.push(
+        `<rect x="0" y="0" width="${width}" height="${height}" fill="${backgroundColor}" />`
+      );
+    } else {
+      svgParts.push(
+        `<rect x="0" y="0" width="${width + offset * 2}" height="${
+          height + offset * 2
+        }" fill="${backgroundColor}" />`
+      );
+    }
+  }
+
+  if (contain) {
+    const [containerWidth, containerHeight] = contain;
+    const imageWidth = width + offset * 2;
+    const imageHeight = height + offset * 2;
+    const containerAspectRatio = containerWidth / containerHeight;
+    const imageAspectRatio = imageWidth / imageHeight;
+
+    let scale,
+      translateX = 0,
+      translateY = 0;
+    if (imageAspectRatio > containerAspectRatio) {
+      scale = containerWidth / imageWidth;
+    } else {
+      scale = containerHeight / imageHeight;
+    }
+    const scaledImageWidth = imageWidth * scale;
+    const scaledImageHeight = imageHeight * scale;
+    translateX = (containerWidth - scaledImageWidth) / 2;
+    translateY = (containerHeight - scaledImageHeight) / 2;
+
     svgParts.push(
-      `<rect x="0" y="0" width="${width + offset * 2}" height="${
-        height + offset * 2
-      }" fill="${backgroundColor}" />`
+      `<g transform="translate(${translateX}, ${translateY}) scale(${scale})">`
     );
   }
 
@@ -73,6 +112,10 @@ export function renderToSvg(
       `<rect x="${rectX}" y="${rectY}" width="${cellSize}" height="${cellSize}" fill="#${fillColorHexCode}" stroke="#${strokeColorHexCode}" stroke-width="${strokeWidth}"/>`
     );
   });
+
+  if (contain) {
+    svgParts.push("</g>");
+  }
 
   svgParts.push("</svg>");
 
