@@ -32,7 +32,7 @@ export function renderToSvg(
     strokeColorHexCode = complementaryColor(fillColorHexCode);
   } else if (strokeColorHexCode && !fillColorHexCode) {
     fillColorHexCode = complementaryColor(strokeColorHexCode);
-  } else {
+  } else if (!fillColorHexCode && !strokeColorHexCode) {
     fillColorHexCode = "ADD8E6";
     strokeColorHexCode = "000000";
   }
