@@ -1,7 +1,8 @@
+import { cookies } from "next/headers";
 import { PropsWithChildren } from "react";
 
 import { ModeContextProvider } from "@-ft/mode-next";
-import { cookies } from "next/headers";
+import { DarkModeSelect } from "@/_internal/components/DarkModeSelect";
 
 import "./index.css";
 
@@ -21,7 +22,12 @@ export default function Layout({ children }: PropsWithChildren) {
           variableName="npm:@-ft/mode-codegen"
           ssrInitialMode={"system"}
         >
-          {children}
+          <div className="min-h-screen bg-background text-foreground">
+            <header className="container mx-auto p-4">
+              <DarkModeSelect />
+            </header>
+            <main className="container mx-auto p-4">{children}</main>
+          </div>
         </ModeContextProvider>
       </body>
     </html>
