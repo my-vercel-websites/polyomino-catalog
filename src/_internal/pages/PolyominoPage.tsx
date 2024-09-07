@@ -87,7 +87,7 @@ function RelatedInternal({
               <div className="grid grid-cols-4 tablet:grid-cols-3 desktop:grid-cols-2 gap-4">
                 {symmetry.map((polyomino, i) => (
                   <PolyominoCard
-                    key={i}
+                    key={toString(toBuffer(polyomino))}
                     polyomino={polyomino}
                     label={`Symmetry ${i + 1}`}
                     onClick={(e) => handlePolyominoClick(e, polyomino)}
@@ -100,7 +100,7 @@ function RelatedInternal({
             <div className="grid grid-cols-4 tablet:grid-cols-3 desktop:grid-cols-2 gap-4">
               {similar.map((polyomino, i) => (
                 <PolyominoCard
-                  key={i}
+                  key={toString(toBuffer(polyomino))}
                   polyomino={polyomino}
                   label={i < subtractive.length ? "Subtractive" : "Additive"}
                   onClick={(e) => handlePolyominoClick(e, polyomino)}
