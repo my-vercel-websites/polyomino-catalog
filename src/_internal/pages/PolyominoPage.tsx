@@ -246,15 +246,29 @@ interface BadgesProps {
 }
 
 function Badges({ polyomino, symmetryGroup }: BadgesProps) {
-  switch (symmetryGroup) {
-    case "None":
-      return (
-        <div className="flex gap-4">
-          <Badge className="mt-4">Symmetry Group: {symmetryGroup}</Badge>
-          <Badge className="mt-4">Tile count: {polyomino.length}</Badge>
-        </div>
-      );
-  }
+  return (
+    <div className="flex flex-wrap gap-x-4">
+      <Badge className="mt-4">Symmetry Group: {symmetryGroup}</Badge>
+      <Badge className="mt-4">Tile count: {polyomino.length}</Badge>
+      {[
+        "All",
+        "Rotation2FoldMirror90",
+        "Rotation2FoldMirror45",
+        "Rotation2Fold",
+      ].includes(symmetryGroup) && (
+        <Badge className="mt-4">Rotation 2 Fold</Badge>
+      )}
+      {["All", "Rotation4Fold"].includes(symmetryGroup) && (
+        <Badge className="mt-4">Rotation 4 Fold</Badge>
+      )}
+      {["All", "Rotation2FoldMirror90", "Mirror90"].includes(symmetryGroup) && (
+        <Badge className="mt-4">Mirror 90°</Badge>
+      )}
+      {["All", "Rotation2FoldMirror45", "Mirror45"].includes(symmetryGroup) && (
+        <Badge className="mt-4">Mirror 45°</Badge>
+      )}
+    </div>
+  );
 }
 
 export function PolyominoPage({
