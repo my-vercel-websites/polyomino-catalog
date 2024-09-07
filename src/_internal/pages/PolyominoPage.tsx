@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { X } from "lucide-react";
 import Link from "next/link";
 import { ReactNode, memo, useCallback, useEffect, useState } from "react";
+import { Comment } from "../components/Comment";
 import { Polyomino } from "../components/Polyomino";
 import { Coord } from "../lib/coord";
 import { getSymmetryGroup } from "../lib/getSymmetryGroup";
@@ -203,6 +204,7 @@ export function PolyominoPage({
           getSymmetryGroupResult={getSymmetryGroupResult}
           onPolyominoClick={handlePolyominoClick}
         />
+        <Comment canonized={toString(toBuffer(polyomino))} />
       </div>
       {sidePaneOpened && (
         <div
