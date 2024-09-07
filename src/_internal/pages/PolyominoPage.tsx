@@ -9,6 +9,7 @@ import Link from "next/link";
 import { ReactNode, memo, useCallback, useEffect, useState } from "react";
 import { Comment } from "../components/Comment";
 import { Polyomino } from "../components/Polyomino";
+import { SymmetryGroup } from "../lib/SymmetryGroup";
 import { Coord } from "../lib/coord";
 import { getSymmetryGroup } from "../lib/getSymmetryGroup";
 import { on } from "../lib/on";
@@ -19,6 +20,19 @@ import { toString } from "../lib/toString";
 export interface PolyominoPageProps {
   getSymmetryGroupResult: ReturnType<typeof getSymmetryGroup>;
 }
+
+const gridClassName =
+  "grid grid-cols-4 tablet:grid-cols-6 tablet:group-[.side-pane]:grid-cols-2 gap-4";
+
+const getSymmetryGroupResultIndexToName = [
+  "90°",
+  "180°",
+  "270°",
+  "transpose",
+  "flip X",
+  "flip diagonally",
+  "flip Y",
+];
 
 interface PolyominoCardProps {
   polyomino: Coord[];
@@ -53,7 +67,7 @@ function RelatedInternal({
   const { symmetry, subtractive, additive } = relatedPolyominoes(
     getSymmetryGroupResult
   );
-  const similar = [...subtractive, ...additive];
+  const [_, self] = getSymmetryGroupResult;
 
   const handlePolyominoClick = useCallback(
     (e: React.MouseEvent, polyomino: Coord[]) => {
@@ -74,36 +88,92 @@ function RelatedInternal({
         <CardTitle>Related Polyominoes</CardTitle>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="symmetry">
+        <Tabs defaultValue="all">
           <TabsList>
+            <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="symmetry">Symmetry</TabsTrigger>
-            <TabsTrigger value="similar">Similar</TabsTrigger>
+            <TabsTrigger value="subtractive">Subtractive</TabsTrigger>
+            <TabsTrigger value="additive">Additive</TabsTrigger>
           </TabsList>
+          <TabsContent value="all">
+            <div className={gridClassName}>
+              <PolyominoCard
+                key={toString(toBuffer(self))}
+                polyomino={self}
+                label="self"
+                onClick={(e) => handlePolyominoClick(e, self)}
+              />
+              {symmetry.map((polyomino, i) => (
+                <PolyominoCard
+                  key={toString(toBuffer(polyomino))}
+                  polyomino={polyomino}
+                  label={
+                    getSymmetryGroupResultIndexToName[
+                      getSymmetryGroupResult.indexOf(polyomino) - 2
+                    ]
+                  }
+                  onClick={(e) => handlePolyominoClick(e, polyomino)}
+                />
+              ))}
+              {subtractive.map((polyomino, i) => (
+                <PolyominoCard
+                  key={toString(toBuffer(polyomino))}
+                  polyomino={polyomino}
+                  label="Subtractive"
+                  onClick={(e) => handlePolyominoClick(e, polyomino)}
+                />
+              ))}
+              {additive.map((polyomino, i) => (
+                <PolyominoCard
+                  key={toString(toBuffer(polyomino))}
+                  polyomino={polyomino}
+                  label="Additive"
+                  onClick={(e) => handlePolyominoClick(e, polyomino)}
+                />
+              ))}
+            </div>
+          </TabsContent>
           <TabsContent value="symmetry">
             {!symmetry.length ? (
               <div className="text-muted-foreground">
                 No symmetry polyominoes.
               </div>
             ) : (
-              <div className="grid grid-cols-4 tablet:grid-cols-3 desktop:grid-cols-2 gap-4">
+              <div className={gridClassName}>
                 {symmetry.map((polyomino, i) => (
                   <PolyominoCard
                     key={toString(toBuffer(polyomino))}
                     polyomino={polyomino}
-                    label={`Symmetry ${i + 1}`}
+                    label={
+                      getSymmetryGroupResultIndexToName[
+                        getSymmetryGroupResult.indexOf(polyomino) - 2
+                      ]
+                    }
                     onClick={(e) => handlePolyominoClick(e, polyomino)}
                   />
                 ))}
               </div>
             )}
           </TabsContent>
-          <TabsContent value="similar">
-            <div className="grid grid-cols-4 tablet:grid-cols-3 desktop:grid-cols-2 gap-4">
-              {similar.map((polyomino, i) => (
+          <TabsContent value="subtractive">
+            <div className={gridClassName}>
+              {subtractive.map((polyomino, i) => (
                 <PolyominoCard
                   key={toString(toBuffer(polyomino))}
                   polyomino={polyomino}
-                  label={i < subtractive.length ? "Subtractive" : "Additive"}
+                  label="Subtractive"
+                  onClick={(e) => handlePolyominoClick(e, polyomino)}
+                />
+              ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="additive">
+            <div className={gridClassName}>
+              {additive.map((polyomino, i) => (
+                <PolyominoCard
+                  key={toString(toBuffer(polyomino))}
+                  polyomino={polyomino}
+                  label="Additive"
                   onClick={(e) => handlePolyominoClick(e, polyomino)}
                 />
               ))}
@@ -140,8 +210,10 @@ function SidePane({
 
   return (
     <div
-      className={`fixed desktop:relative inset-y-0 right-0 w-full tablet:w-96 desktop:w-1/3 bg-background shadow-lg p-4 overflow-y-auto transform transition-transform duration-300 ease-in-out ${
-        isOpen ? "translate-x-0" : "translate-x-full desktop:translate-x-0"
+      className={`group side-pane fixed desktop:relative inset-y-0 right-0 w-full tablet:w-96 desktop:w-1/3 bg-background shadow-lg p-4 overflow-y-auto transform transition-transform duration-300 ease-in-out ${
+        isOpen
+          ? "translate-x-0"
+          : "translate-x-full desktop:translate-x-0 desktop:hidden"
       }`}
       aria-hidden={!isOpen}
     >
@@ -166,6 +238,23 @@ function SidePane({
       />
     </div>
   );
+}
+
+interface BadgesProps {
+  polyomino: Coord[];
+  symmetryGroup: SymmetryGroup;
+}
+
+function Badges({ polyomino, symmetryGroup }: BadgesProps) {
+  switch (symmetryGroup) {
+    case "None":
+      return (
+        <div className="flex gap-4">
+          <Badge className="mt-4">Symmetry Group: {symmetryGroup}</Badge>
+          <Badge className="mt-4">Tile count: {polyomino.length}</Badge>
+        </div>
+      );
+  }
 }
 
 export function PolyominoPage({
@@ -195,8 +284,8 @@ export function PolyominoPage({
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center">
-              <Polyomino polyomino={polyomino} width="100%" height="40vw" />
-              <Badge className="mt-4">Symmetry Group: {symmetryGroup}</Badge>
+              <Polyomino polyomino={polyomino} width="40vw" height="40vw" />
+              <Badges polyomino={polyomino} symmetryGroup={symmetryGroup} />
             </div>
           </CardContent>
         </Card>
