@@ -22,7 +22,7 @@ export interface PolyominoPageProps {
 }
 
 const gridClassName =
-  "grid grid-cols-4 tablet:grid-cols-6 tablet:group-[.side-pane]:grid-cols-2 gap-4";
+  "grid grid-cols-4 tablet:grid-cols-6 desktop:grid-cols-5 tablet:group-[.side-pane]:grid-cols-2 desktop:group-[.closed]:grid-cols-8 desktop:group-[.closed_.side-pane]:grid-cols-2 gap-4";
 
 const getSymmetryGroupResultIndexToName = [
   "90°",
@@ -217,7 +217,7 @@ function SidePane({
       }`}
       aria-hidden={!isOpen}
     >
-      <div className="flex justify-between items-center mb-4 desktop:hidden">
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Polyomino Details</h2>
         <Button
           variant="ghost"
@@ -276,7 +276,11 @@ export function PolyominoPage({
   }, []);
 
   return (
-    <div className="container mx-auto p-4 desktop:flex desktop:gap-6">
+    <div
+      className={`${
+        sidePaneOpened ? "opened" : "closed"
+      } group container mx-auto p-4 desktop:flex desktop:gap-6`}
+    >
       <div className="desktop:flex-1">
         <Card>
           <CardHeader>
