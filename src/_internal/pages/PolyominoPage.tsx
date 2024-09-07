@@ -1,98 +1,67 @@
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { memo, ReactNode } from "react";
 import { Polyomino } from "../components/Polyomino";
-import { canonizeFixed } from "../lib/canonizeFixed";
-import { coord, Coord } from "../lib/coord";
 import { getSymmetryGroup } from "../lib/getSymmetryGroup";
-import { isValid } from "../lib/isValid";
-import { toBuffer } from "../lib/toBuffer";
-import { toString } from "../lib/toString";
+import { relatedPolyominoes } from "../lib/relatedPolyominoes";
 
 export interface PolyominoPageProps {
   getSymmetryGroupResult: ReturnType<typeof getSymmetryGroup>;
 }
 
-const directions: Coord[] = [
-  [0, 1],
-  [0, -1],
-  [1, 0],
-  [-1, 0],
-];
-
 function RelatedInternal({ getSymmetryGroupResult }: PolyominoPageProps) {
-  const [_, polyomino] = getSymmetryGroupResult;
-
-  const others = getSymmetryGroupResult.slice(2) as Coord[][];
-  const symmetryPolyominoes: Coord[][] = [];
-  const symmetryPolyominoSet = new Set<string>([polyomino.map(coord).join()]);
-  for (const other of others) {
-    const key = other.map(coord).join();
-    if (symmetryPolyominoSet.has(key)) {
-      continue;
-    } else {
-      symmetryPolyominoSet.add(key);
-      symmetryPolyominoes.push(other);
-    }
-  }
-
-  const subtract: Coord[][] = [];
-  const subtractSet = new Set<string>();
-  for (const coord of polyomino) {
-    const subtracted = canonizeFixed(polyomino.filter((arr) => arr !== coord));
-    const string = toString(toBuffer(subtracted));
-    if (isValid(string) && !subtractSet.has(string)) {
-      subtractSet.add(string);
-      subtract.push(subtracted);
-    }
-  }
-
-  const add: Coord[][] = [];
-  const addSet = new Set<string>();
-  for (const [x, y] of polyomino) {
-    for (const [dirX, dirY] of directions) {
-      const added = canonizeFixed([...polyomino, [x + dirX, y + dirY]]);
-      const string = toString(toBuffer(added));
-      if (
-        new Set(added.map(coord)).size === added.length &&
-        isValid(string) &&
-        !addSet.has(string)
-      ) {
-        addSet.add(string);
-        add.push(added);
-      }
-    }
-  }
-
-  const similarPolyominoes = [...subtract, ...add];
+  const { symmetry, subtractive, additive } = relatedPolyominoes(
+    getSymmetryGroupResult
+  );
+  const similar = [...subtractive, ...additive];
 
   return (
-    <>
-      {!symmetryPolyominoes.length ? (
-        <div>No symmetry polyominoes.</div>
-      ) : (
-        <div>
-          Related symmetry polyominoes:{" "}
-          {symmetryPolyominoes.map((symmetryPolyomino, i) => (
-            <Polyomino
-              key={i}
-              polyomino={symmetryPolyomino}
-              width={100}
-              height={100}
-            />
-          ))}
-        </div>
-      )}
-      <div>
-        Other similar polyominoes:{" "}
-        {similarPolyominoes.map((symmetryPolyomino, i) => (
-          <Polyomino
-            key={i}
-            polyomino={symmetryPolyomino}
-            width={100}
-            height={100}
-          />
-        ))}
-      </div>
-    </>
+    <Card className="mt-6">
+      <CardHeader>
+        <CardTitle>Related Polyominoes</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="symmetry">
+          <TabsList>
+            <TabsTrigger value="symmetry">Symmetry</TabsTrigger>
+            <TabsTrigger value="similar">Similar</TabsTrigger>
+          </TabsList>
+          <TabsContent value="symmetry">
+            {!symmetry.length ? (
+              <div className="text-muted-foreground">
+                No symmetry polyominoes.
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {symmetry.map((polyomino, i) => (
+                  <div key={i} className="flex flex-col items-center">
+                    <Polyomino polyomino={polyomino} width={100} height={100} />
+                    <Badge variant="secondary" className="mt-2">
+                      Symmetry {i + 1}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+          <TabsContent value="similar">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {similar.map((polyomino, i) => (
+                <div key={i} className="flex flex-col items-center">
+                  <Polyomino polyomino={polyomino} width={100} height={100} />
+                  <Badge variant="outline" className="mt-2">
+                    {i < subtractive.length ? "Subtractive" : "Additive"}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -104,9 +73,18 @@ export function PolyominoPage({
   const [symmetryGroup, polyomino] = getSymmetryGroupResult;
 
   return (
-    <div>
-      <Polyomino polyomino={polyomino} width="100%" height="40vw" />
-      <div>Symmetry Group: {symmetryGroup}</div>
+    <div className="container mx-auto p-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Main Polyomino</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center">
+            <Polyomino polyomino={polyomino} width="100%" height="40vw" />
+            <Badge className="mt-4">Symmetry Group: {symmetryGroup}</Badge>
+          </div>
+        </CardContent>
+      </Card>
       <Related getSymmetryGroupResult={getSymmetryGroupResult} />
     </div>
   );

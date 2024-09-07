@@ -20,20 +20,17 @@ function PolyominoInternal(props: PolyominoProps) {
     skipSize: true,
   });
   const href = `/${[toString(toBuffer(props.polyomino))]}`;
+  const name = toString(toBuffer(polyomino));
 
   return (
-    <Link
-      href={href}
-      style={{
-        display: "inline-block",
-        backgroundSize: "contain",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundImage: `url(data:image/svg+xml;base64,${btoa(svgString)})`,
-        width,
-        height,
-      }}
-    />
+    <Link href={href}>
+      <img
+        className="w-full h-full"
+        style={{ width, height }}
+        src={`data:image/svg+xml;base64,${btoa(svgString)}`}
+        alt={`Polyomino ${name}`}
+      />
+    </Link>
   );
 }
 

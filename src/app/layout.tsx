@@ -3,6 +3,8 @@ import { PropsWithChildren } from "react";
 import { ModeContextProvider } from "@-ft/mode-next";
 import { cookies } from "next/headers";
 
+import "./index.css";
+
 export default function Layout({ children }: PropsWithChildren) {
   return (
     <html

@@ -5,7 +5,7 @@ import { isValid } from "../../../../_internal/lib/isValid";
 import { renderToSvg } from "../../../../_internal/lib/renderToSvg";
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { anyForm: string } }
 ) {
   const { anyForm } = params;

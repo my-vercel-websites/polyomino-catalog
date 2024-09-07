@@ -24,20 +24,24 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
     // strict
     // TODO:
     // package
   },
-  "exclude": [
-    "samples",
-    "**/__test__",
-    "**/*.test.ts"
-  ],
   "include": [
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "tailwind.config.js"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }
