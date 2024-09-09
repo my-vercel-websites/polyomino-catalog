@@ -28,7 +28,12 @@ function hsvToRgbHexCode(h: number, s: number, v: number): string {
   return `${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
-export function defaultRenderOptions(polyomino: Coord[]): RenderToSvgOptions {
+export function defaultRenderOptions(
+  polyomino: Coord[]
+): Pick<
+  RenderToSvgOptions,
+  "fillColorHexCode" | "strokeColorHexCode" | "backgroundColor"
+> {
   const [hue, other] = simpleHash(toString(canonizeFree(polyomino)));
   const fillColorHexCode = hsvToRgbHexCode(
     hue,
@@ -40,8 +45,14 @@ export function defaultRenderOptions(polyomino: Coord[]): RenderToSvgOptions {
     other / 2,
     other / 4
   );
+  const backgroundColor = `#${hsvToRgbHexCode(
+    hue,
+    other / 8,
+    other / 4 + 0.75
+  )}`;
   return {
     fillColorHexCode,
     strokeColorHexCode,
+    backgroundColor,
   };
 }

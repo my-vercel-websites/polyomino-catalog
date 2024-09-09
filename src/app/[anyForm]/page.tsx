@@ -44,7 +44,7 @@ export function generateMetadata({ params }: Params): Metadata {
     description,
     openGraph: {
       title,
-      images: `${env("METADATA_BASE")}/api/og/${anyForm}`,
+      images: `${env("METADATA_BASE")}api/og/${anyForm}`,
       description,
     },
   };
