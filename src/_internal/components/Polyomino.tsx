@@ -17,6 +17,7 @@ function PolyominoInternal(props: PolyominoProps) {
   const { polyomino, width, height, onClick } = props;
   const svgString = renderToSvg(polyomino, {
     ...defaultRenderOptions(polyomino),
+    backgroundColor: "transparent",
     ...props,
     skipSize: true,
   });
